@@ -668,12 +668,17 @@ body::after {
     padding: 14px;
     background: var(--surface-warm);
     border-radius: var(--radius);
-    border: 2px solid var(--border);
+    border: 3px solid var(--primary-light);
 }
 
 .numpad.active {
     display: grid;
-    animation: fade-in 0.2s ease;
+    animation: fade-in 0.2s ease, numpad-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes numpad-glow {
+    0%, 100% { border-color: var(--primary-light); box-shadow: 0 0 0 0 rgba(59, 142, 165, 0); }
+    50% { border-color: var(--primary); box-shadow: 0 0 12px 2px rgba(59, 142, 165, 0.25); }
 }
 
 .numpad-key {
@@ -718,18 +723,18 @@ body::after {
     border-color: var(--error);
 }
 
-.numpad-ok {
-    background: linear-gradient(135deg, var(--success), #3d9a6e);
-    border-color: var(--success);
+.numpad-next {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-color: var(--primary);
     color: white;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
 }
 
-.numpad-ok:hover {
-    box-shadow: 0 2px 8px rgba(76, 175, 130, 0.3);
+.numpad-next:hover {
+    box-shadow: 0 2px 8px rgba(59, 142, 165, 0.3);
 }
 
-.numpad-ok:active {
+.numpad-next:active {
     transform: scale(0.93);
 }
 

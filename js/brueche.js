@@ -734,7 +734,13 @@
         });
         numpadActiveInput = input;
         input.classList.add('numpad-active');
-        input.focus();
+        // Numpad sichtbar scrollen auf Mobile
+        const numpad = document.getElementById('numpad');
+        if (numpad && numpad.classList.contains('active')) {
+            setTimeout(() => {
+                numpad.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
     }
 
     function advanceToNextInput() {
@@ -752,13 +758,21 @@
     function highlightCheckButton() {
         const btn = document.getElementById('checkBtn');
         if (!btn || btn.style.display === 'none') return;
+
+        // Puls-Animation starten
         btn.classList.remove('btn-pulse');
         void btn.offsetWidth;
         btn.classList.add('btn-pulse');
-        // Kurzer Delay damit Mobile-Browser das Scroll erlauben
+
+        // Scroll: Button muss sichtbar sein auf Mobile
         setTimeout(() => {
-            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
+            const rect = btn.getBoundingClientRect();
+            const viewH = window.innerHeight;
+            // Wenn Button nicht im sichtbaren Bereich
+            if (rect.bottom > viewH || rect.top < 0) {
+                btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 150);
     }
 
     function cancelAutoAdvance() {
@@ -836,6 +850,12 @@
         const numpad = document.getElementById('numpad');
         if (numpad) {
             numpad.classList.toggle('active', visible);
+            // Numpad ins Bild scrollen auf Mobile
+            if (visible) {
+                setTimeout(() => {
+                    numpad.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 150);
+            }
         }
     }
 

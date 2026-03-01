@@ -11,7 +11,7 @@
     <div class="container">
         <!-- Navigation -->
         <nav class="nav">
-            <a href="index.html" class="nav-back">← Zurueck</a>
+            <a href="index.html" class="nav-back">← Zurück</a>
             <span class="nav-title">🍕 Bruchrechnen</span>
             <div class="nav-score">
                 <span class="score-stars" id="starsDisplay">⭐ 0</span>
@@ -33,9 +33,11 @@
         <!-- Tabs -->
         <div class="tabs" id="modeTabs">
             <button class="tab active" data-mode="recognize">Erkennen</button>
-            <button class="tab" data-mode="simplify">Kuerzen</button>
+            <button class="tab" data-mode="simplify">Kürzen</button>
             <button class="tab" data-mode="expand">Erweitern</button>
             <button class="tab" data-mode="add">Addieren</button>
+            <button class="tab" data-mode="build">Bauen</button>
+            <button class="tab" data-mode="paint">Einfärben</button>
         </div>
 
         <!-- Hauptbereich -->
@@ -44,19 +46,68 @@
                 <!-- Aufgabentext -->
                 <p class="task-instruction" id="taskInstruction">Welcher Bruch wird hier angezeigt?</p>
 
-                <!-- SVG Visualisierung -->
+                <!-- SVG Visualisierung (für Erkennen/Kürzen/Erweitern/Addieren) -->
                 <div class="svg-container" id="svgContainer"></div>
 
-                <!-- Aufgabe + Eingabe -->
-                <div class="task-fraction-display" id="taskDisplay">
-                    <!-- Wird dynamisch befuellt -->
+                <!-- Standard Aufgabe + Eingabe -->
+                <div class="task-fraction-display" id="taskDisplay"></div>
+
+                <!-- Build-Modus Bereich -->
+                <div class="build-area" id="buildArea">
+                    <div class="build-layout">
+                        <!-- Drop Zone -->
+                        <div class="drop-zone" id="dropZone">
+                            <svg viewBox="0 0 200 200" id="buildSVG"></svg>
+                            <div class="drop-zone-label" id="dropLabel">Klicke auf Bruchstücke oder ziehe sie hierher!</div>
+                            <div class="ghost-circle" id="ghostCircle">
+                                <svg viewBox="0 0 200 200" id="ghostSVG"></svg>
+                            </div>
+                        </div>
+
+                        <!-- Hinzugefügte Stücke -->
+                        <div class="build-added" id="buildAdded"></div>
+
+                        <!-- Summe Anzeige -->
+                        <div class="build-sum" id="buildSum"></div>
+
+                        <!-- Bruchstücke Palette -->
+                        <div class="pieces-palette" id="piecesPalette"></div>
+
+                        <!-- Antwort-Eingabe -->
+                        <div class="build-answer" id="buildAnswer">
+                            <span class="build-answer-label">Ergebnis =</span>
+                            <div class="fraction-input">
+                                <input type="number" id="buildNum" placeholder="?" autocomplete="off">
+                                <span class="fraction-line"></span>
+                                <input type="number" id="buildDen" placeholder="?" autocomplete="off">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Pruefen Button -->
-                <div class="actions">
-                    <button class="btn btn-primary" id="checkBtn">Pruefen ✓</button>
-                    <button class="btn btn-success" id="nextBtn" style="display:none;">Naechste →</button>
+                <!-- Einfärben-Modus Bereich -->
+                <div class="paint-area" id="paintArea">
+                    <div class="paint-layout">
+                        <div class="paint-grid-container" id="paintGrid"></div>
+                        <div class="paint-counter" id="paintCounter">0 von 0 eingefärbt</div>
+                    </div>
                 </div>
+
+                <!-- Aktionsbuttons -->
+                <div class="actions">
+                    <button class="btn btn-primary" id="checkBtn">Prüfen ✓</button>
+                    <button class="btn btn-success" id="nextBtn" style="display:none;">Nächste →</button>
+                </div>
+
+                <!-- Stütze + Ghost + Reset Buttons -->
+                <div class="support-buttons">
+                    <button class="btn btn-small btn-outline" id="hintBtn">💡 Stütze</button>
+                    <button class="btn btn-small btn-outline" id="ghostBtn">👻 Lösung zeigen</button>
+                    <button class="btn btn-small btn-reset" id="resetBtn">↺ Neustart</button>
+                </div>
+
+                <!-- Stütze Anzeige -->
+                <div class="hint-box" id="hintBox"></div>
 
                 <!-- Feedback -->
                 <div class="feedback" id="feedback"></div>

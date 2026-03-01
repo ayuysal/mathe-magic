@@ -998,8 +998,8 @@
             showFeedback(true, state.currentTask);
             showNumpad(false);
             document.getElementById('checkBtn').style.display = 'none';
-            document.getElementById('nextBtn').style.display = '';
-            document.getElementById('nextBtn').focus();
+            document.getElementById('nextBtn').style.display = 'none';
+            setTimeout(() => { if (state.answered) nextTask(); }, 1500);
         } else {
             renderSimplifyChain();
             divInput.value = '';
@@ -1399,9 +1399,18 @@
             svgC.style.display = 'block';
             renderFractionSVG(a.num, a.den, svgC);
         }
-        document.getElementById('checkBtn').style.display = 'none';
-        document.getElementById('nextBtn').style.display = '';
-        document.getElementById('nextBtn').focus();
+
+        if (result) {
+            // Richtig → nach 1.5s automatisch weiter
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'none';
+            setTimeout(() => { if (state.answered) nextTask(); }, 1500);
+        } else {
+            // Falsch → Nächste-Button zeigen, Kind liest die Lösung
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = '';
+            document.getElementById('nextBtn').focus();
+        }
     }
 
     function updateTabs() {

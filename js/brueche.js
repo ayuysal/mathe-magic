@@ -755,7 +755,10 @@
         btn.classList.remove('btn-pulse');
         void btn.offsetWidth;
         btn.classList.add('btn-pulse');
-        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Kurzer Delay damit Mobile-Browser das Scroll erlauben
+        setTimeout(() => {
+            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
     }
 
     function cancelAutoAdvance() {
@@ -815,8 +818,16 @@
             const cur = numpadActiveInput.value;
             if (cur.length < 3) {
                 numpadActiveInput.value = cur + val;
-                // Auto-Advance starten nach jeder Ziffer
-                startAutoAdvance();
+
+                const idx = numpadInputs.indexOf(numpadActiveInput);
+                if (idx === numpadInputs.length - 1) {
+                    // Letztes Feld hat jetzt einen Wert → sofort Button pulsieren
+                    cancelAutoAdvance();
+                    highlightCheckButton();
+                } else {
+                    // Nicht letztes Feld → Auto-Advance zum nächsten
+                    startAutoAdvance();
+                }
             }
         }
     }

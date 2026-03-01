@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bruchrechnen — MatheMagic</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navigation -->
+        <nav class="nav">
+            <a href="index.html" class="nav-back">← Zurueck</a>
+            <span class="nav-title">🍕 Bruchrechnen</span>
+            <div class="nav-score">
+                <span class="score-stars" id="starsDisplay">⭐ 0</span>
+                <span class="score-points" id="pointsDisplay">0 Pkt</span>
+                <span class="score-streak" id="streakDisplay"></span>
+            </div>
+        </nav>
+
+        <!-- Schwierigkeitsgrad -->
+        <div class="difficulty-bar">
+            <span class="difficulty-label">Schwierigkeit:</span>
+            <select class="difficulty-select" id="difficultySelect">
+                <option value="easy">Leicht (Kl. 3-4)</option>
+                <option value="medium">Mittel (Kl. 4-5)</option>
+                <option value="hard">Schwer (Kl. 5-6)</option>
+            </select>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="modeTabs">
+            <button class="tab active" data-mode="recognize">Erkennen</button>
+            <button class="tab" data-mode="simplify">Kuerzen</button>
+            <button class="tab" data-mode="expand">Erweitern</button>
+            <button class="tab" data-mode="add">Addieren</button>
+        </div>
+
+        <!-- Hauptbereich -->
+        <div class="card">
+            <div class="task-area">
+                <!-- Aufgabentext -->
+                <p class="task-instruction" id="taskInstruction">Welcher Bruch wird hier angezeigt?</p>
+
+                <!-- SVG Visualisierung -->
+                <div class="svg-container" id="svgContainer"></div>
+
+                <!-- Aufgabe + Eingabe -->
+                <div class="task-fraction-display" id="taskDisplay">
+                    <!-- Wird dynamisch befuellt -->
+                </div>
+
+                <!-- Pruefen Button -->
+                <div class="actions">
+                    <button class="btn btn-primary" id="checkBtn">Pruefen ✓</button>
+                    <button class="btn btn-success" id="nextBtn" style="display:none;">Naechste →</button>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <!-- Fortschritt -->
+            <div class="progress-bar-container">
+                <div class="progress-info">
+                    <span id="taskCounter">Aufgabe 1 von 10</span>
+                    <span id="correctCounter">0 richtig</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            MatheMagic &copy; 2026
+        </footer>
+    </div>
+
+    <!-- Ergebnis-Overlay -->
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-card">
+            <div class="result-emoji" id="resultEmoji">🎉</div>
+            <h2 class="result-title" id="resultTitle">Super gemacht!</h2>
+            <div class="result-stats">
+                <div class="result-stat">
+                    <div class="result-stat-value" id="resultCorrect">0</div>
+                    <div class="result-stat-label">Richtig</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="resultWrong">0</div>
+                    <div class="result-stat-label">Falsch</div>
+                </div>
+                <div class="result-stat">
+                    <div class="result-stat-value" id="resultPoints">0</div>
+                    <div class="result-stat-label">Punkte</div>
+                </div>
+            </div>
+            <div class="result-stars" id="resultStars"></div>
+            <p class="result-message" id="resultMessage">Weiter so!</p>
+            <button class="btn btn-primary btn-block" id="restartBtn">Nochmal spielen 🔄</button>
+        </div>
+    </div>
+
+    <script src="js/confetti.js"></script>
+    <script src="js/brueche.js"></script>
+</body>
+</html>

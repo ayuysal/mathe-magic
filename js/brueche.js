@@ -744,8 +744,18 @@
         if (idx < numpadInputs.length - 1) {
             setActiveInput(numpadInputs[idx + 1]);
         } else {
-            handleCheck();
+            // Letztes Feld → Prüfen-Button pulsieren und hinscrollen
+            highlightCheckButton();
         }
+    }
+
+    function highlightCheckButton() {
+        const btn = document.getElementById('checkBtn');
+        if (!btn || btn.style.display === 'none') return;
+        btn.classList.remove('btn-pulse');
+        void btn.offsetWidth;
+        btn.classList.add('btn-pulse');
+        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function cancelAutoAdvance() {
@@ -762,17 +772,21 @@
         cancelAutoAdvance();
         if (!numpadActiveInput) return;
         const idx = numpadInputs.indexOf(numpadActiveInput);
-        // Nur auto-advance wenn es ein nächstes Feld gibt
-        if (idx < numpadInputs.length - 1) {
-            numpadActiveInput.classList.add('numpad-waiting');
-            autoAdvanceTimer = setTimeout(() => {
-                autoAdvanceTimer = null;
-                if (numpadActiveInput) {
-                    numpadActiveInput.classList.remove('numpad-waiting');
-                }
+
+        numpadActiveInput.classList.add('numpad-waiting');
+        autoAdvanceTimer = setTimeout(() => {
+            autoAdvanceTimer = null;
+            if (numpadActiveInput) {
+                numpadActiveInput.classList.remove('numpad-waiting');
+            }
+            if (idx < numpadInputs.length - 1) {
+                // Nächstes Feld
                 advanceToNextInput();
-            }, 800);
-        }
+            } else {
+                // Letztes Feld → Prüfen-Button pulsieren
+                highlightCheckButton();
+            }
+        }, 800);
     }
 
     function handleNumpadKey(val) {
@@ -1369,6 +1383,7 @@
 
     function handleCheck() {
         if (state.answered) return;
+        document.getElementById('checkBtn').classList.remove('btn-pulse');
 
         // Schrittweises Kürzen hat eigene Logik
         if (state.currentTask?.mode === 'simplify') {

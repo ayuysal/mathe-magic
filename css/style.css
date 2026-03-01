@@ -656,6 +656,111 @@ body::after {
 }
 
 /* ========================================
+   Zahlentastatur (Numpad)
+   ======================================== */
+
+.numpad {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 280px;
+    margin: 18px auto 6px;
+    padding: 14px;
+    background: var(--surface-warm);
+    border-radius: var(--radius);
+    border: 2px solid var(--border);
+}
+
+.numpad.active {
+    display: grid;
+    animation: fade-in 0.2s ease;
+}
+
+.numpad-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 8px;
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: white;
+    color: var(--text);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.numpad-key:hover {
+    background: rgba(59, 142, 165, 0.06);
+    border-color: var(--primary-light);
+}
+
+.numpad-key:active {
+    transform: scale(0.93);
+    background: rgba(59, 142, 165, 0.12);
+    border-color: var(--primary);
+}
+
+.numpad-del {
+    background: var(--error-bg);
+    border-color: var(--error-light);
+    color: var(--error);
+    font-size: 1.3rem;
+}
+
+.numpad-del:hover {
+    background: rgba(224, 122, 106, 0.18);
+    border-color: var(--error);
+}
+
+.numpad-ok {
+    background: linear-gradient(135deg, var(--success), #3d9a6e);
+    border-color: var(--success);
+    color: white;
+    font-size: 1.3rem;
+}
+
+.numpad-ok:hover {
+    box-shadow: 0 2px 8px rgba(76, 175, 130, 0.3);
+}
+
+.numpad-ok:active {
+    transform: scale(0.93);
+}
+
+/* Aktives Eingabefeld Highlight */
+.numpad-active {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(59, 142, 165, 0.2) !important;
+    background: white !important;
+}
+
+/* Blinkender Unterstrich — wartet auf weitere Eingabe */
+.numpad-waiting {
+    border-bottom: 3px solid var(--primary) !important;
+    animation: blink-cursor 0.6s step-end infinite !important;
+}
+
+@keyframes blink-cursor {
+    0%, 100% { border-bottom-color: var(--primary); }
+    50% { border-bottom-color: transparent; }
+}
+
+/* Label unter Eingabefeldern */
+.fraction-input-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ========================================
    Buttons
    ======================================== */
 
@@ -1382,6 +1487,17 @@ body::after {
 
     .piece-tile-label {
         font-size: 0.75rem;
+    }
+
+    .numpad {
+        max-width: 260px;
+        gap: 6px;
+        padding: 10px;
+    }
+
+    .numpad-key {
+        padding: 12px 6px;
+        font-size: 1.25rem;
     }
 
     .result-stats {

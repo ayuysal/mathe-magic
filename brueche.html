@@ -77,9 +77,9 @@
                         <div class="build-answer" id="buildAnswer">
                             <span class="build-answer-label">Ergebnis =</span>
                             <div class="fraction-input">
-                                <input type="number" id="buildNum" placeholder="?" autocomplete="off">
+                                <input type="number" id="buildNum" placeholder="?" autocomplete="off" inputmode="none" readonly>
                                 <span class="fraction-line"></span>
-                                <input type="number" id="buildDen" placeholder="?" autocomplete="off">
+                                <input type="number" id="buildDen" placeholder="?" autocomplete="off" inputmode="none" readonly>
                             </div>
                         </div>
                     </div>
@@ -91,6 +91,22 @@
                         <div class="paint-grid-container" id="paintGrid"></div>
                         <div class="paint-counter" id="paintCounter">0 von 0 eingefärbt</div>
                     </div>
+                </div>
+
+                <!-- Zahlentastatur -->
+                <div class="numpad" id="numpad">
+                    <button class="numpad-key" data-val="1">1</button>
+                    <button class="numpad-key" data-val="2">2</button>
+                    <button class="numpad-key" data-val="3">3</button>
+                    <button class="numpad-key" data-val="4">4</button>
+                    <button class="numpad-key" data-val="5">5</button>
+                    <button class="numpad-key" data-val="6">6</button>
+                    <button class="numpad-key" data-val="7">7</button>
+                    <button class="numpad-key" data-val="8">8</button>
+                    <button class="numpad-key" data-val="9">9</button>
+                    <button class="numpad-key numpad-del" data-val="del">⌫</button>
+                    <button class="numpad-key" data-val="0">0</button>
+                    <button class="numpad-key numpad-ok" data-val="ok">✓</button>
                 </div>
 
                 <!-- Aktionsbuttons -->

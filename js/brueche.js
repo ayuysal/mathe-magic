@@ -591,9 +591,11 @@
 
     function createInputHTML(idPrefix) {
         return `<div class="fraction-input" id="${idPrefix}Input">
-            <input type="number" id="${idPrefix}Num" placeholder="?" autocomplete="off">
+            <input type="number" id="${idPrefix}Num" placeholder="?" autocomplete="off" inputmode="none" readonly>
+            <span class="fraction-input-label">Zähler</span>
             <span class="fraction-line"></span>
-            <input type="number" id="${idPrefix}Den" placeholder="?" autocomplete="off">
+            <input type="number" id="${idPrefix}Den" placeholder="?" autocomplete="off" inputmode="none" readonly>
+            <span class="fraction-input-label">Nenner</span>
         </div>`;
     }
 
@@ -619,10 +621,11 @@
             return;
         }
 
-        // Einfärben-Modus
+        // Einfärben-Modus (kein Numpad nötig)
         if (task.mode === 'paint') {
             display.style.display = 'none';
             svgContainer.style.display = 'none';
+            showNumpad(false);
             if (paintArea) {
                 paintArea.classList.add('active');
                 const paintGrid = document.getElementById('paintGrid');
@@ -688,18 +691,27 @@
         setupInputNavigation();
     }
 
-    // ---- Input-Navigation: Enter springt Zähler → Nenner ----
+    // ---- Numpad-Steuerung ----
+
+    let numpadActiveInput = null;
+    let numpadInputs = [];
+    let autoAdvanceTimer = null;
 
     function setupInputNavigation() {
-        // Alle Eingabefelder im Aufgabenbereich finden
-        const inputs = document.querySelectorAll('.task-area input[type="number"]:not(.divisor-input)');
-        inputs.forEach((input, i) => {
+        numpadInputs = Array.from(
+            document.querySelectorAll('.task-area input[type="number"]:not(.divisor-input)')
+        );
+
+        numpadInputs.forEach((input, i) => {
+            input.addEventListener('click', () => setActiveInput(input));
+            input.addEventListener('focus', () => setActiveInput(input));
+
+            // Keyboard-Fallback für Desktop
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
-                    if (i < inputs.length - 1) {
+                    if (i < numpadInputs.length - 1) {
                         e.preventDefault();
-                        inputs[i + 1].focus();
-                        inputs[i + 1].select();
+                        setActiveInput(numpadInputs[i + 1]);
                     } else if (e.key === 'Enter') {
                         e.preventDefault();
                         handleCheck();
@@ -707,10 +719,119 @@
                 }
             });
         });
-        // Focus aufs erste Feld
-        if (inputs.length > 0) {
-            setTimeout(() => { inputs[0].focus(); }, 50);
+
+        if (numpadInputs.length > 0) {
+            setTimeout(() => setActiveInput(numpadInputs[0]), 50);
         }
+
+        showNumpad(numpadInputs.length > 0);
+    }
+
+    function setActiveInput(input) {
+        cancelAutoAdvance();
+        numpadInputs.forEach(i => {
+            i.classList.remove('numpad-active', 'numpad-waiting');
+        });
+        numpadActiveInput = input;
+        input.classList.add('numpad-active');
+        input.focus();
+    }
+
+    function advanceToNextInput() {
+        cancelAutoAdvance();
+        if (!numpadActiveInput) return;
+        const idx = numpadInputs.indexOf(numpadActiveInput);
+        if (idx < numpadInputs.length - 1) {
+            setActiveInput(numpadInputs[idx + 1]);
+        } else {
+            handleCheck();
+        }
+    }
+
+    function cancelAutoAdvance() {
+        if (autoAdvanceTimer) {
+            clearTimeout(autoAdvanceTimer);
+            autoAdvanceTimer = null;
+        }
+        if (numpadActiveInput) {
+            numpadActiveInput.classList.remove('numpad-waiting');
+        }
+    }
+
+    function startAutoAdvance() {
+        cancelAutoAdvance();
+        if (!numpadActiveInput) return;
+        const idx = numpadInputs.indexOf(numpadActiveInput);
+        // Nur auto-advance wenn es ein nächstes Feld gibt
+        if (idx < numpadInputs.length - 1) {
+            numpadActiveInput.classList.add('numpad-waiting');
+            autoAdvanceTimer = setTimeout(() => {
+                autoAdvanceTimer = null;
+                if (numpadActiveInput) {
+                    numpadActiveInput.classList.remove('numpad-waiting');
+                }
+                advanceToNextInput();
+            }, 800);
+        }
+    }
+
+    function handleNumpadKey(val) {
+        if (state.answered) {
+            if (val === 'ok') nextTask();
+            return;
+        }
+
+        if (val === 'ok') {
+            cancelAutoAdvance();
+            advanceToNextInput();
+            return;
+        }
+
+        if (val === 'del') {
+            cancelAutoAdvance();
+            if (numpadActiveInput) {
+                const cur = numpadActiveInput.value;
+                numpadActiveInput.value = cur.slice(0, -1);
+            }
+            return;
+        }
+
+        // Ziffer eingeben
+        if (numpadActiveInput) {
+            const cur = numpadActiveInput.value;
+            if (cur.length < 3) {
+                numpadActiveInput.value = cur + val;
+                // Auto-Advance starten nach jeder Ziffer
+                startAutoAdvance();
+            }
+        }
+    }
+
+    function showNumpad(visible) {
+        const numpad = document.getElementById('numpad');
+        if (numpad) {
+            numpad.classList.toggle('active', visible);
+        }
+    }
+
+    function initNumpad() {
+        const numpad = document.getElementById('numpad');
+        if (!numpad) return;
+
+        numpad.addEventListener('click', (e) => {
+            const key = e.target.closest('.numpad-key');
+            if (!key) return;
+            e.preventDefault();
+            handleNumpadKey(key.dataset.val);
+        });
+
+        // Touch: Prevent default um Doppel-Tap-Zoom zu verhindern
+        numpad.addEventListener('touchend', (e) => {
+            const key = e.target.closest('.numpad-key');
+            if (!key) return;
+            e.preventDefault();
+            handleNumpadKey(key.dataset.val);
+        });
     }
 
     // ---- Schrittweises Kürzen ----
@@ -745,22 +866,26 @@
                 <div class="divisor-area" id="divisorArea">
                     <span class="divisor-prompt">Teile Zähler und Nenner durch:</span>
                     <input type="number" class="divisor-input" id="divisorInput"
-                           placeholder="?" min="2" autocomplete="off">
+                           placeholder="?" min="2" autocomplete="off" inputmode="none" readonly>
                 </div>
                 <div class="simplify-error-msg" id="simplifyError">&nbsp;</div>
             </div>`;
 
         renderSimplifyChain();
 
-        // Enter auf Divisor-Input → Prüfen
+        // Divisor-Input in Numpad-System einbinden
         const divInput = document.getElementById('divisorInput');
+        numpadInputs = [divInput];
+        divInput.addEventListener('click', () => setActiveInput(divInput));
+        divInput.addEventListener('focus', () => setActiveInput(divInput));
         divInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 handleCheck();
             }
         });
-        setTimeout(() => divInput.focus(), 50);
+        setTimeout(() => setActiveInput(divInput), 50);
+        showNumpad(true);
     }
 
     function renderSimplifyChain() {
@@ -871,13 +996,14 @@
             launchConfetti();
 
             showFeedback(true, state.currentTask);
+            showNumpad(false);
             document.getElementById('checkBtn').style.display = 'none';
             document.getElementById('nextBtn').style.display = '';
             document.getElementById('nextBtn').focus();
         } else {
             renderSimplifyChain();
             divInput.value = '';
-            divInput.focus();
+            setActiveInput(divInput);
 
             const stepLabel = document.getElementById('stepLabel');
             stepLabel.textContent = `Schritt ${sState.stepCount + 1}`;
@@ -958,19 +1084,25 @@
 
         renderBuildCircle([], buildSVG);
 
-        // Input-Navigation für Build-Antwort
+        // Build-Inputs in Numpad-System einbinden
         const bNum = document.getElementById('buildNum');
         const bDen = document.getElementById('buildDen');
         if (bNum && bDen) {
+            numpadInputs = [bNum, bDen];
+            bNum.addEventListener('click', () => setActiveInput(bNum));
+            bNum.addEventListener('focus', () => setActiveInput(bNum));
+            bDen.addEventListener('click', () => setActiveInput(bDen));
+            bDen.addEventListener('focus', () => setActiveInput(bDen));
             bNum.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || (e.key === 'Tab' && !e.shiftKey)) {
-                    e.preventDefault(); bDen.focus(); bDen.select();
+                    e.preventDefault(); setActiveInput(bDen);
                 }
             });
             bDen.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); handleCheck(); }
             });
         }
+        showNumpad(true);
     }
 
     function addBuildPiece(den) {
@@ -1314,6 +1446,7 @@
         });
         document.getElementById('restartBtn').addEventListener('click', startRound);
 
+        initNumpad();
         updateTabs(); updateScoreDisplay(); startRound();
     }
 
